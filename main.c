@@ -54,6 +54,22 @@ void createLink(graph* graph, int src,int dest,int weight)
         
 }
 
+void printGraph(graph* g)
+{
+    for(int i=0;i<g->v;i++)
+    {
+        printf("Node %d:",i);
+        node* cur=g->array[i].head;
+
+        while(cur!=NULL)
+        {
+            printf("(%d,%d)->",cur->data,cur->wt);
+            cur=cur->next;
+        }
+        printf("\n");
+    }
+}
+
 int main()
 {
     FILE* fp=fopen("./adjacencylist.txt","r");
@@ -62,7 +78,7 @@ int main()
         int v;
         fscanf(fp,"%d\n",&v);
         printf("%d\n",v);
-        graph* mygraph=createGraph(v);
+        graph* mygraph=createGraph(v+1);
         
         int cur,dst,weight;
         
@@ -70,7 +86,7 @@ int main()
         {
             
             fscanf(fp,"%d",&cur);
-            printf("%d\t",cur);
+            printf("%d",cur);
             int dst,wt;
             while(fgetc(fp)!='\n' && !feof(fp))
             {                            
@@ -81,9 +97,10 @@ int main()
             }
             printf("\n");
             
-            
         }
-
+        printf("\n#########################\n");
+        printGraph(mygraph);
+        fclose(fp);
     }
     
     
