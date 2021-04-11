@@ -265,8 +265,8 @@ void printArr(int wt[], int n,int parent[],int src)
     printf("Vertex\t Distance\tPath");
     for (int i = 1; i < n-1; i++)
     {
-        printf("\n%d -> %d \t\t %d\t\t%d ",
-                      src, i, wt[i], src);
+        printf("\n%d \t\t %d\t\t%d ",
+                       i, wt[i], src);
         printPath(parent, i);
     }
 }
