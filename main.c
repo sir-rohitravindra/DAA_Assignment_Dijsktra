@@ -242,13 +242,35 @@ int isInMinHeap(struct MinHeap *minHeap, int v)
    return 0;
 }
  
-// A utility function used to print the solution
-void printArr(int wt[], int n)
+void printPath(int parent[], int j)
 {
-    printf("Vertex   wtance from Source\n");
-    for (int i = 1; i < n-1; ++i)
-        printf("%d \t\t %d\n", i, wt[i]);
+      
+    // Base Case : If j is source
+    if (parent[j] == - 1)
+        return;
+  
+    printPath(parent, parent[j]);
+  
+    printf("%d ", j);
 }
+// A utility function used to print the solution
+void printArr(int wt[], int n,int parent[],int src)
+{
+   /* printf("Vertex   wtance from Source\n");
+    for (int i = 1; i < n-1; ++i){
+        printf("%d \t\t %d\n", i, wt[i]);
+        //printPath(parent, i);
+    }*/
+
+    printf("Vertex\t Distance\tPath");
+    for (int i = 1; i < n-1; i++)
+    {
+        printf("\n%d -> %d \t\t %d\t\t%d ",
+                      src, i, wt[i], src);
+        printPath(parent, i);
+    }
+}
+
  
 // The main function that calulates
 // wtances of shortest paths from src to all
@@ -261,7 +283,9 @@ void dijkstra(graph* graph, int src)
    
     // wt values used to pick
     // minimum weight edge in cut
-    int wt[V];    
+    int wt[V];   
+
+    int parent[V]; 
  
     // minHeap represents set E
     struct MinHeap* minHeap = createMinHeap(V);
@@ -274,6 +298,7 @@ void dijkstra(graph* graph, int src)
         minHeap->array[v] = newheapNode(v,wt[v]);
         minHeap->pos[v] = v;
     }
+    parent[src] = -1;
  
     // Make wt value of src vertex
     // as 0 so that it is extracted first
@@ -321,13 +346,14 @@ void dijkstra(graph* graph, int src)
                 // update wtance
                 // value in min heap also
                 decreaseKey(minHeap, v, wt[v]);
+                parent[v] = u;
             }
             pCrawl = pCrawl->next;
         }
     }
  
     // print the calculated shortest wtances
-    printArr(wt, V);
+    printArr(wt, V,parent,src);
 }
 
 int main()
