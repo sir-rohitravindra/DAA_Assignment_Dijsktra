@@ -48,9 +48,9 @@ node* createNode(int adj,int weight)
 
 void createLink(graph* graph, int src,int dest,int weight)
 {    
-    node* new=createNode(dest,weight);
-    new->next = graph->array[src].head;
-    graph->array[src].head = new;
+    node* new=createNode(src,weight);
+    new->next = graph->array[dest].head;
+    graph->array[dest].head = new;
         
 }
 
