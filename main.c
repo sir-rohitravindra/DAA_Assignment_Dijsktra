@@ -75,6 +75,7 @@ typedef struct MinHeapNode
 {
     int  v;
     int wt;
+    int parent;
 }heapNode;
  
 // Structure to represent a min heap
@@ -99,6 +100,7 @@ heapNode* newheapNode(int v,int wt)
     heapNode* new =(heapNode*)malloc(sizeof(heapNode));
     new->v = v;
     new->wt = wt;
+    //new->parent=0;
     return new;
 }
  
@@ -242,19 +244,18 @@ int isInMinHeap(struct MinHeap *minHeap, int v)
    return 0;
 }
  
-void printPath(int parent[], int j)
+void printPath(MinHeap* minheap, int j)
 {
       
     // Base Case : If j is source
-    if (parent[j] == - 1)
+    if (minheap->array[j]->parent == - 1)
         return;
-    printf("%d ", j);
-    printPath(parent, parent[j]);
-  
+    printf("%d ", minheap->array[j]->parent);
+    printPath(minheap, minheap->array[j]->parent);  
     
 }
 // A utility function used to print the solution
-void printArr(int wt[], int n,int parent[],int src)
+void printArr(int wt[], int n,MinHeap* minheap ,int src)
 {
    /* printf("Vertex   wtance from Source\n");
     for (int i = 1; i < n-1; ++i){
@@ -267,7 +268,7 @@ void printArr(int wt[], int n,int parent[],int src)
     {
         printf("\n%d \t\t %d\t\t",
                        i, wt[i]);
-        printPath(parent, i);
+        printPath(minheap, i);
         printf("%d",src);
     }
 }
@@ -286,7 +287,7 @@ void dijkstra(graph* graph, int src)
     // minimum weight edge in cut
     int wt[V];   
 
-    int parent[V]; 
+    //int parent[V]; 
  
     // minHeap represents set E
     struct MinHeap* minHeap = createMinHeap(V);
@@ -299,8 +300,7 @@ void dijkstra(graph* graph, int src)
         minHeap->array[v] = newheapNode(v,wt[v]);
         minHeap->pos[v] = v;
     }
-    parent[src] = -1;
- 
+    minHeap->array[src]->parent=-1; 
     // Make wt value of src vertex
     // as 0 so that it is extracted first
     minHeap->array[src] =newheapNode(src, wt[src]);
@@ -347,14 +347,16 @@ void dijkstra(graph* graph, int src)
                 // update wtance
                 // value in min heap also
                 decreaseKey(minHeap, v, wt[v]);
-                parent[v] = u;
+                minHeap->array[u]->parent=v;
+                printf("\t##%d...%d\n",v,minHeap->array[v]->parent);
+                //parent[v] = u;
             }
             pCrawl = pCrawl->next;
         }
     }
  
     // print the calculated shortest wtances
-    printArr(wt, V,parent,src);
+    printArr(wt, V,minHeap,src);
 }
 
 int main()
