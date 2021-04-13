@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<limits.h>
 
 typedef struct node
 {
@@ -265,10 +266,17 @@ void printArr(int wt[], int n,int parent[],int src)
     printf("Vertex\t Distance\tPath");
     for (int i = 1; i < n-1; i++)
     {
-        printf("\n%d \t\t %d\t\t",
-                       i, wt[i]);
-        printPath(parent, i);
-        printf("%d",src);
+        
+        if(wt[i]!=INT_MAX)
+        {
+            printf("\n%d \t\t %d\t\t",i, wt[i]);        
+            printPath(parent, i);
+            printf("%d",src);
+        }
+        else
+        {
+            printf("\n%d  \t\t Inf\t\tNO PATH",i);
+        }
     }
 }
 
