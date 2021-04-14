@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<limits.h>
 
 typedef struct node
 {
@@ -248,10 +249,10 @@ void printPath(int parent[], int j)
     // Base Case : If j is source
     if (parent[j] == - 1)
         return;
-  
+    printf("%d ", j);
     printPath(parent, parent[j]);
   
-    printf("%d ", j);
+    
 }
 // A utility function used to print the solution
 void printArr(int wt[], int n,int parent[],int src)
@@ -265,9 +266,17 @@ void printArr(int wt[], int n,int parent[],int src)
     printf("Vertex\t Distance\tPath");
     for (int i = 1; i < n-1; i++)
     {
-        printf("\n%d \t\t %d\t\t%d ",
-                       i, wt[i], src);
-        printPath(parent, i);
+        
+        if(wt[i]!=INT_MAX)
+        {
+            printf("\n%d \t\t %d\t\t",i, wt[i]);        
+            printPath(parent, i);
+            printf("%d",src);
+        }
+        else
+        {
+            printf("\n%d  \t\t Inf\t\tNO PATH",i);
+        }
     }
 }
 
