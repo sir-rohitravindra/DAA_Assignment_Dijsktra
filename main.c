@@ -2,6 +2,9 @@
 #include<stdlib.h>
 #include<limits.h>
 
+
+/*Adjcency List implementation */
+
 typedef struct node
 {
     int data;
@@ -23,6 +26,7 @@ typedef struct graph
     
 }graph;
 
+//utility function to setup and return a graph struct ptr
 graph* createGraph(int V)
 {
     graph* new = (graph*)malloc(sizeof(graph));
@@ -31,12 +35,13 @@ graph* createGraph(int V)
     new->array = (list*)malloc(V * sizeof(list));
  
     for (int i = 0; i < V; ++i)
+    {
         new->array[i].head = NULL;
- 
+    }    
     return new;
 }
 
-
+//utility function to malloc and return a adj list node
 node* createNode(int adj,int weight)
 {
     node* new=(node*)malloc(sizeof(node));
@@ -46,7 +51,9 @@ node* createNode(int adj,int weight)
     return new;
 }
  
-
+//utility fn to add an edge 
+//the edge is added in the reverse direction as per this 
+//implementation of dijkstra
 void createLink(graph* graph, int src,int dest,int weight)
 {    
     node* new=createNode(src,weight);
@@ -55,6 +62,8 @@ void createLink(graph* graph, int src,int dest,int weight)
         
 }
 
+//utility fn to print the graph 
+//for debugging
 void printGraph(graph* g)
 {
     for(int i=0;i<g->v;i++)
@@ -71,8 +80,9 @@ void printGraph(graph* g)
     }
 }
 
-//////
-typedef struct MinHeapNode
+/*implemntation of Heap data stuct credits gfg */
+
+typedef struct heapNode
 {
     int  v;
     int wt;
@@ -80,22 +90,16 @@ typedef struct MinHeapNode
 }heapNode;
  
 // Structure to represent a min heap
-typedef struct MinHeap
-{
-     
-    // Number of heap nodes present currently
-    int size;    
-   
-    // Capacity of min heap
-    int capacity; 
-   
-    // This is needed for decreaseKey()
-    int *pos;   
+typedef struct minHeap
+{  
+    
+    int capacity; //capacity of heap (array repn)
+    int size;  // Heap nodes in the heap at that instace
+    int *pos;  // This is needed for decreaseKey() 
     heapNode **array;
 }MinHeap;
  
-// A utility function to create a
-// new Min Heap Node
+// A utility function to create and return a min heap node 
 heapNode* newheapNode(int v,int wt)
 {
     heapNode* new =(heapNode*)malloc(sizeof(heapNode));
@@ -104,81 +108,80 @@ heapNode* newheapNode(int v,int wt)
     return new;
 }
  
-// A utility function to create a Min Heap
+// A utility function to create and return a new minHeap
 MinHeap* createMinHeap(int capacity)
 {
-    MinHeap* minHeap =(struct MinHeap*)malloc(sizeof(MinHeap));
+    MinHeap* minHeap =(struct minHeap*)malloc(sizeof(MinHeap));
     minHeap->pos = (int *)malloc(capacity * sizeof(int));
     minHeap->size = 0;
     minHeap->capacity = capacity;
-    minHeap->array =(struct MinHeapNode**)malloc(capacity *sizeof(struct MinHeapNode*));
+    minHeap->array =(struct heapNode**)malloc(capacity *sizeof(struct heapNode*));
     return minHeap;
 }
  
-
-void swapHeapNodes(heapNode** a,heapNode** b)
+//Function to swap to heap nodes
+void swapHeapNodes(heapNode** n1,heapNode** n2)
 {
-    heapNode* t = *a;
-    *a = *b;
-    *b = t;
+    heapNode* temp = *n1;
+    *n1 = *n2;
+    *n2 = temp;
 } 
 
-void minHeapify(struct MinHeap* minHeap,
-                                  int idx)
+//function to rectify the min heap after each deletion
+void heapify(struct minHeap* minHeap,int idx)
 {
     int smallest, left, right;
     smallest = idx;
     left = 2 * idx + 1;
     right = 2 * idx + 2;
  
-    if (left < minHeap->size &&
-        minHeap->array[left]->wt <
-         minHeap->array[smallest]->wt )
-      smallest = left;
+    if (left < minHeap->size && minHeap->array[left]->wt < minHeap->array[smallest]->wt)
+    { 
+        smallest = left;
+    }
  
-    if (right < minHeap->size &&
-        minHeap->array[right]->wt <
-         minHeap->array[smallest]->wt )
-      smallest = right;
+    if (right < minHeap->size && minHeap->array[right]->wt < minHeap->array[smallest]->wt)
+    {
+        smallest = right;
+    }
  
     if (smallest != idx)
     {
         // The nodes to be swapped in min heap
-        heapNode *smallestNode =
-             minHeap->array[smallest];
-        heapNode *idxNode =
-                 minHeap->array[idx];
+        heapNode *smallestNode = minHeap->array[smallest];
+        heapNode *idxNode = minHeap->array[idx];
  
         // Swap positions
         minHeap->pos[smallestNode->v] = idx;
         minHeap->pos[idxNode->v] = smallest;
  
         // Swap nodes
-        swapHeapNodes(&minHeap->array[smallest],
-                         &minHeap->array[idx]);
+        swapHeapNodes(&minHeap->array[smallest],&minHeap->array[idx]);
  
-        minHeapify(minHeap, smallest);
+        heapify(minHeap, smallest);
     }
 }
- 
-int isEmpty(struct MinHeap* minHeap)
+
+//utility function to check if heap empty to terminate the dijkstra loop.
+int isEmpty(struct minHeap* minHeap)
 {
     return minHeap->size == 0;
 }
- 
-struct MinHeapNode* extractMin(struct MinHeap*
-                                   minHeap)
+
+//utility function to return the root element(here the minmum element in the min heap) 
+struct heapNode* extractMin(struct minHeap* minHeap)
 {
     if (isEmpty(minHeap))
+    {
         return NULL;
+
+    }       
  
     // Store the root node
-    struct MinHeapNode* root =
-                   minHeap->array[0];
+    struct heapNode* root = minHeap->array[0];
  
     // Replace root node with last node
-    struct MinHeapNode* lastNode =
-         minHeap->array[minHeap->size - 1];
+    struct heapNode* lastNode = minHeap->array[minHeap->size - 1];
     minHeap->array[0] = lastNode;
  
     // Update position of last node
@@ -186,13 +189,14 @@ struct MinHeapNode* extractMin(struct MinHeap*
     minHeap->pos[lastNode->v] = 0;
  
     // Reduce heap size and heapify root
-    --minHeap->size;
-    minHeapify(minHeap, 0);
+    minHeap->size=minHeap->size - 1;
+    heapify(minHeap, 0);
  
     return root;
 }
 
-void decreaseKey(struct MinHeap* minHeap,int v, int wt)
+//Function to decrease the distance values of heap nodes.
+void decreaseKey(struct minHeap* minHeap,int v, int wt)
 {
     // Get the index of v in  heap array
     int i = minHeap->pos[v];
@@ -200,16 +204,11 @@ void decreaseKey(struct MinHeap* minHeap,int v, int wt)
     // Get the node and update its wt value
     minHeap->array[i]->wt = wt;
  
-    // Travel up while the complete
-    // tree is not hepified.
-    // This is a O(Logn) loop
     while (i && minHeap->array[i]->wt < minHeap->array[(i - 1) / 2]->wt)
     {
         // Swap this node with its parent
-        minHeap->pos[minHeap->array[i]->v] =
-                                      (i-1)/2;
-        minHeap->pos[minHeap->array[
-                             (i-1)/2]->v] = i;
+        minHeap->pos[minHeap->array[i]->v] = (i-1)/2;
+        minHeap->pos[minHeap->array[(i-1)/2]->v] = i;
         swapHeapNodes(&minHeap->array[i],&minHeap->array[(i - 1) / 2]);
  
         // move to parent index
@@ -217,25 +216,27 @@ void decreaseKey(struct MinHeap* minHeap,int v, int wt)
     }
 }
 
-int isInMinHeap(struct MinHeap *minHeap, int v)
+//check if node is in the min heap.
+int isInMinHeap(struct minHeap *minHeap, int v)
 {
-   if (minHeap->pos[v] < minHeap->size)
-     return 1;
-   return 0;
+    if (minHeap->pos[v] < minHeap->size)
+    {
+        return 1;
+    }
+    return 0;
 }
  
+//utility function to print the path
 void printPath(int parent[], int j)
 {
-      
     // Base Case : If j is source
     if (parent[j] == - 1)
         return;
     printf("%d ", j);
     printPath(parent, parent[j]);
-  
-    
 }
-// A utility function used to print the solution
+
+// A utility function used for outputting
 void printArr(int wt[], int n,int parent[],int src)
 {   
     for (int i = 1; i < n-1; i++)
@@ -254,22 +255,18 @@ void printArr(int wt[], int n,int parent[],int src)
     }
 }
 
- 
-// The main function that calulates
-// wtances of shortest paths from src to all
-// vertices. It is a O(ELogV) function
+/*The driver function which performs the dijkstras algorithm on the graph */
 void dijkstra(graph* graph, int src)
-{
-     
+{     
     // Get the number of vertices in graph
     int V = graph->v;
+    int wt[V];  //stores distances of the nodes from source.  
 
-    int wt[V];   
+    int parent[V];  //stores the parent ele of each node.
 
-    int parent[V]; 
+    struct minHeap* minHeap = createMinHeap(V);
 
-    struct MinHeap* minHeap = createMinHeap(V);
-
+    //initilizations.
     for (int v = 0; v < V; ++v)
     {
         wt[v] = INT_MAX;
@@ -290,34 +287,32 @@ void dijkstra(graph* graph, int src)
 
     while (!isEmpty(minHeap))
     {
-        // Extract the vertex with
-        // minimum wtance value
-        struct MinHeapNode* minHeapNode = extractMin(minHeap);
+        // Extract the vertex with minimum distance value
+        struct heapNode* minHeapNode = extractMin(minHeap);
        
         // Store the extracted vertex number
         int u = minHeapNode->v;
  
-        node* pCrawl = graph->array[u].head;
-        while (pCrawl != NULL)
+        node* cur = graph->array[u].head;
+        while (cur != NULL)
         {
-            int v = pCrawl->data;
+            int v = cur->data;
  
             if (isInMinHeap(minHeap, v) &&
                       wt[u] != INT_MAX &&
-              pCrawl->wt + wt[u] < wt[v])
+              cur->wt + wt[u] < wt[v])
             {
-                wt[v] = wt[u] + pCrawl->wt;
+                wt[v] = wt[u] + cur->wt;
  
-                // update wtance
-                // value in min heap also
+                // update distance value in min heap
                 decreaseKey(minHeap, v, wt[v]);
                 parent[v] = u;
             }
-            pCrawl = pCrawl->next;
+            cur = cur->next;
         }
     }
  
-    // print the calculated shortest wtances
+    // print the calculated shortest distances
     printArr(wt, V,parent,src);
 }
 
