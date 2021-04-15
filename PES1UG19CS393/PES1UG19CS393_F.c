@@ -1,30 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<limits.h>
-
-
-/*Adjcency List implementation */
-
-typedef struct node
-{
-    int data;
-    int wt;
-    struct node* next;
-
-}node;
-
-typedef struct list
-{    
-    struct node* head;
-    
-}list;
-
-typedef struct graph
-{
-    int v;
-    struct list* array;
-    
-}graph;
+#include "./PES1UG19CS393_H.h"
 
 //utility function to setup and return a graph struct ptr
 graph* createGraph(int V)
@@ -80,25 +57,7 @@ void printGraph(graph* g)
     }
 }
 
-/*implemntation of Heap data stuct credits gfg */
 
-typedef struct heapNode
-{
-    int  v;
-    int wt;
-    int parentele;
-}heapNode;
- 
-// Structure to represent a min heap
-typedef struct minHeap
-{  
-    
-    int capacity; //capacity of heap (array repn)
-    int size;  // Heap nodes in the heap at that instace
-    int *pos;  // This is needed for decreaseKey() 
-    heapNode **array;
-}MinHeap;
- 
 // A utility function to create and return a min heap node 
 heapNode* newheapNode(int v,int wt)
 {
@@ -118,14 +77,6 @@ MinHeap* createMinHeap(int capacity)
     minHeap->array =(struct heapNode**)malloc(capacity *sizeof(struct heapNode*));
     return minHeap;
 }
- 
-//Function to swap to heap nodes
-void swapHeapNodes(heapNode** n1,heapNode** n2)
-{
-    heapNode* temp = *n1;
-    *n1 = *n2;
-    *n2 = temp;
-} 
 
 //function to rectify the min heap after each deletion
 void heapify(struct minHeap* minHeap,int idx)
@@ -162,6 +113,16 @@ void heapify(struct minHeap* minHeap,int idx)
     }
 }
 
+ 
+//Function to swap to heap nodes
+void swapHeapNodes(heapNode** n1,heapNode** n2)
+{
+    heapNode* temp = *n1;
+    *n1 = *n2;
+    *n2 = temp;
+} 
+
+
 //utility function to check if heap empty to terminate the dijkstra loop.
 int isEmpty(struct minHeap* minHeap)
 {
@@ -169,7 +130,7 @@ int isEmpty(struct minHeap* minHeap)
 }
 
 //utility function to return the root element(here the minmum element in the min heap) 
-struct heapNode* extractMin(struct minHeap* minHeap)
+struct heapNode* returnRoot(struct minHeap* minHeap)
 {
     if (isEmpty(minHeap))
     {
@@ -211,7 +172,6 @@ void decreaseKey(struct minHeap* minHeap,int v, int wt)
         minHeap->pos[minHeap->array[(i-1)/2]->v] = i;
         swapHeapNodes(&minHeap->array[i],&minHeap->array[(i - 1) / 2]);
  
-        // move to parent index
         i = (i - 1) / 2;
     }
 }
@@ -237,7 +197,7 @@ void printPath(int parent[], int j)
 }
 
 // A utility function used for outputting
-void printArr(int wt[], int n,int parent[],int src)
+void printSolution(int wt[], int n,int parent[],int src)
 {   
     for (int i = 1; i < n-1; i++)
     {
@@ -288,7 +248,7 @@ void dijkstra(graph* graph, int src)
     while (!isEmpty(minHeap))
     {
         // Extract the vertex with minimum distance value
-        struct heapNode* minHeapNode = extractMin(minHeap);
+        struct heapNode* minHeapNode = returnRoot(minHeap);
        
         // Store the extracted vertex number
         int u = minHeapNode->v;
@@ -313,45 +273,5 @@ void dijkstra(graph* graph, int src)
     }
  
     // print the calculated shortest distances
-    printArr(wt, V,parent,src);
-}
-
-int main()
-{
-    FILE* fp=fopen("./adjacencylist.txt","r");
-    if(fp!=NULL)
-    {
-        int v;
-        fscanf(fp,"%d\n",&v);
-        //printf("%d\n",v);
-        graph* mygraph=createGraph(v+1);
-        
-        int cur;
-        
-        for(int i=0;i<v && !feof(fp);i++)
-        {
-            
-            fscanf(fp,"%d",&cur);
-            //printf("%d",cur);
-            int dst,wt;
-            while(!feof(fp) && fgetc(fp)!='\n')
-            {                            
-                fseek(fp,-1,SEEK_CUR);
-                fscanf(fp,"%d %d",&dst,&wt);
-                //printf("\t%d,%d",dst,wt);
-                createLink(mygraph,cur,dst,wt);
-            }
-            //printf("\n");
-            
-        }
-        //printf("\n#########################\n");
-        //printGraph(mygraph);
-
-        dijkstra(mygraph,v);
-
-
-        fclose(fp);
-    }
-    
-    
+    printSolution(wt, V,parent,src);
 }
